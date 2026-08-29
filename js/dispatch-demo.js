@@ -133,7 +133,8 @@
 
     stationMarker = L.marker([STATION_COORDS.lat, STATION_COORDS.lng], { icon: stationIcon })
       .addTo(map)
-      .bindPopup('<b>Fire Station</b><br>Dispatch origin');
+      .bindTooltip('Maninagar Fire Station', { direction: 'top', offset: [0, -26], className: 'ext-marker-tooltip' })
+      .bindPopup('<b>Maninagar Fire Station</b><br>Dispatch origin');
 
   } else {
     els.mapEl.style.display = 'none';
@@ -207,19 +208,20 @@
     if (leafletAvailable && map) {
       fireMarker = L.marker([FIRE_COORDS.lat, FIRE_COORDS.lng], { icon: fireIcon })
         .addTo(map)
-        .bindPopup('<b>🔥 FIRE DETECTED</b><br>Extingo suppression active')
+        .bindTooltip('JNV Ahmedabad', { direction: 'top', offset: [0, -26], className: 'ext-marker-tooltip' })
+        .bindPopup('<b>🔥 FIRE DETECTED</b><br>JNV Ahmedabad<br>Extingo suppression active')
         .openPopup();
       map.flyTo([FIRE_COORDS.lat, FIRE_COORDS.lng], FIRE_ZOOM);
     } else {
       els.fallbackEl.classList.add('fire-mode');
       els.fallbackPin.textContent = '🔥';
       els.fallbackCoords.textContent = coordStr;
-      els.fallbackLabel.textContent = 'FIRE DETECTED — Extingo suppression active';
+      els.fallbackLabel.textContent = 'FIRE DETECTED — JNV Ahmedabad — Extingo suppression active';
     }
 
     logEvent('Fire alert received from Extingo. Incident at ' + coordStr + '.', 'emergency');
     if (window.ExtingoAlert) {
-      window.ExtingoAlert.show('Incident coordinates: ' + coordStr + '\nCalculating shortest route from station…');
+      window.ExtingoAlert.show('JNV Ahmedabad — ' + coordStr + '\nCalculating shortest route from Maninagar Fire Station…');
     }
     fetchRoute();
   }
