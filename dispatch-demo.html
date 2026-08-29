@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Extingo — Fire Department Dispatch</title>
+<link rel="stylesheet" href="assets/fonts/fonts.css">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/dispatch.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <div class="brand-text">
+        <span class="brand-name">EXTINGO</span>
+        <span class="brand-sub">Fire Department Dispatch</span>
+      </div>
+    </div>
+    <nav class="site-nav" aria-label="Primary">
+      <a class="site-nav-link" href="index.html">Dashboard</a>
+      <a class="site-nav-link is-active" href="dispatch-demo.html">Dispatch</a>
+      <a class="site-nav-link" href="documents.html">Documents</a>
+    </nav>
+    <div class="header-meta">
+      <div class="meta-item">
+        <span class="meta-label">Console ID</span>
+        <span class="meta-value">EX-FD-01 · DEMO</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Local Time</span>
+        <span class="meta-value" id="clock">--:--:--</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="hazard-rule" role="presentation"></div>
+
+  <main class="dashboard">
+
+    <div class="demo-mode-badge" role="note">
+      <span class="demo-mode-dot" aria-hidden="true"></span>
+      Demo Mode — Manually Triggered, Not Live GPS
+    </div>
+
+    <section id="status-banner" class="status-banner status-normal" aria-live="polite">
+      <span class="status-led" aria-hidden="true"></span>
+      <div class="status-copy">
+        <span class="status-label">Dispatch Status</span>
+        <span class="status-value" id="status-text">STANDBY</span>
+      </div>
+      <span class="status-detail" id="status-detail">No active incident</span>
+    </section>
+
+    <section class="dispatch-layout" aria-label="Dispatch map and routing">
+
+      <div class="map-panel">
+        <header class="panel-head">
+          <span class="panel-eyebrow">MAP</span>
+          <h3 class="panel-title">Incident Map</h3>
+          <span class="panel-note">Leaflet · OpenStreetMap</span>
+        </header>
+        <div class="map-canvas-wrap">
+          <div id="map"></div>
+          <div id="map-fallback" class="map-fallback">
+            <div class="map-fallback-pin" id="fallback-pin" aria-hidden="true">📍</div>
+            <div class="map-fallback-coords" id="fallback-coords">Awaiting trigger</div>
+            <div class="map-fallback-label" id="fallback-label">Map tiles unavailable — showing coordinates only</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="route-panel">
+        <header class="panel-head">
+          <span class="panel-eyebrow">ROUTE</span>
+          <h3 class="panel-title">Shortest Path</h3>
+          <span class="panel-note">OSRM routing</span>
+        </header>
+
+        <dl class="route-stats">
+          <div class="route-stat">
+            <dt>Distance</dt>
+            <dd id="route-distance">—</dd>
+          </div>
+          <div class="route-stat">
+            <dt>ETA</dt>
+            <dd id="route-eta">—</dd>
+          </div>
+          <div class="route-stat">
+            <dt>Incident Coordinates</dt>
+            <dd id="route-fire-coords">—</dd>
+          </div>
+          <div class="route-stat">
+            <dt>Station Coordinates</dt>
+            <dd id="route-station-coords">22.996947, 72.603083</dd>
+          </div>
+        </dl>
+
+        <p class="route-note" id="route-note">Press "Trigger Fire Alert" to plot the incident and calculate the fastest driving route from the station.</p>
+      </div>
+
+    </section>
+
+    <section class="log-panel">
+      <button type="button" class="log-toggle" id="log-toggle" aria-expanded="true" aria-controls="log-list">
+        <span class="panel-eyebrow">LOG</span>
+        <h3 class="panel-title">Dispatch Log</h3>
+        <span class="log-toggle-icon" aria-hidden="true">▾</span>
+      </button>
+      <ul class="log-list" id="log-list"></ul>
+    </section>
+
+    <section class="input-panel" aria-label="Dispatch trigger controls">
+      <header class="panel-head">
+        <span class="panel-eyebrow">CONTROL</span>
+        <h3 class="panel-title">Dispatch Trigger</h3>
+        <span class="panel-note">Judge demo mode — button-triggered, not live GPS</span>
+      </header>
+      <p class="input-hint" style="margin-top:0;">
+        Simulates the moment Extingo's GPS module reports a confirmed fire. In the live system this happens automatically and instantly, with no human step in between.
+      </p>
+      <div class="input-actions">
+        <button type="button" class="submit-btn" id="trigger-alert">Trigger Fire Alert</button>
+        <button type="button" class="reset-btn" id="reset-dispatch">Reset</button>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <span>Extingo Fire Department Dispatch — demo build, manually triggered incident</span>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script src="js/dispatch-demo.js"></script>
+</body>
+</html>
