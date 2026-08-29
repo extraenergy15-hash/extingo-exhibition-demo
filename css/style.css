@@ -784,6 +784,115 @@ h1, h2, h3 { margin: 0; font-family: var(--font-display); }
 }
 
 /* ==========================================================================
+   Fire alert overlay (popup + siren UI) — shared across pages
+   ========================================================================== */
+.ext-alert-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(5, 3, 2, 0.72);
+  backdrop-filter: blur(3px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.ext-alert-overlay.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.ext-alert-card {
+  background: var(--surface);
+  border: 1px solid var(--red);
+  border-radius: 10px;
+  box-shadow: 0 0 0 1px rgba(255,71,87,0.15), 0 20px 60px rgba(0,0,0,0.6);
+  padding: 36px 40px;
+  max-width: 420px;
+  width: calc(100% - 48px);
+  text-align: center;
+  transform: scale(0.92) translateY(8px);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.ext-alert-overlay.is-visible .ext-alert-card {
+  transform: scale(1) translateY(0);
+}
+
+.ext-alert-icon {
+  font-size: 3.2rem;
+  line-height: 1;
+  margin-bottom: 10px;
+  animation: ext-alert-pulse 0.8s ease-in-out infinite alternate;
+}
+@keyframes ext-alert-pulse {
+  from { transform: scale(1); filter: drop-shadow(0 0 4px rgba(255,71,87,0.4)); }
+  to   { transform: scale(1.15); filter: drop-shadow(0 0 16px rgba(255,71,87,0.85)); }
+}
+
+.ext-alert-title {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--red);
+  margin: 0 0 8px;
+}
+
+.ext-alert-detail {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-dim);
+  margin: 0 0 22px;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+.ext-alert-ack {
+  all: unset;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.05em;
+  color: #0a0c0e;
+  background: linear-gradient(135deg, var(--red), #ff6b6b);
+  padding: 12px 32px;
+  border-radius: 6px;
+  transition: filter 0.2s ease;
+}
+.ext-alert-ack:hover { filter: brightness(1.1); }
+.ext-alert-ack:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ext-alert-icon { animation: none; }
+  .ext-alert-card { transition: none; }
+}
+
+/* ==========================================================================
+   Focus-visible polish (keyboard navigation)
+   ========================================================================== */
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ==========================================================================
+   Page transition polish — soft fade-in on load
+   ========================================================================== */
+.dashboard,
+.site-header {
+  animation: ext-page-fade-in 0.4s ease both;
+}
+@keyframes ext-page-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================================
    Responsive
    ========================================================================== */
 @media (max-width: 760px) {
@@ -798,4 +907,5 @@ h1, h2, h3 { margin: 0; font-family: var(--font-display); }
 @media (prefers-reduced-motion: reduce) {
   .status-emergency { animation: none; }
   .gauge-needle, .gauge-fill, .zone-map-dot { transition: none; }
+  .dashboard, .site-header { animation: none; }
 }
