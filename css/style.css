@@ -51,6 +51,47 @@ body {
 h1, h2, h3 { margin: 0; font-family: var(--font-display); }
 
 /* ==========================================================================
+   Fire-department-informed banner (top of page)
+   Hidden by default; shown + pulsing on a 3s loop while an emergency is
+   active, stopped when the incident clears or the demo is reset.
+   ========================================================================== */
+.fd-banner {
+  position: sticky;
+  top: 0;
+  z-index: 500;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background: linear-gradient(90deg, var(--red), var(--amber));
+  color: #0a0c0e;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  box-shadow: 0 2px 18px rgba(255, 71, 87, 0.45);
+}
+
+.fd-banner.is-visible {
+  display: flex;
+  animation: fd-banner-pulse 3s ease-in-out infinite;
+}
+
+.fd-banner-icon { font-size: 18px; }
+
+@keyframes fd-banner-pulse {
+  0%   { filter: brightness(1);    transform: scale(1); }
+  50%  { filter: brightness(1.35); transform: scale(1.015); }
+  100% { filter: brightness(1);    transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fd-banner.is-visible { animation: none; }
+}
+
+/* ==========================================================================
    Header
    ========================================================================== */
 .site-header {
