@@ -218,12 +218,16 @@
     }
 
     logEvent('Fire alert received from Extingo. Incident at ' + coordStr + '.', 'emergency');
+    if (window.ExtingoAlert) {
+      window.ExtingoAlert.show('Incident coordinates: ' + coordStr + '\nCalculating shortest route from station…');
+    }
     fetchRoute();
   }
 
   function resetDispatch() {
     state.triggered = false;
     setStatus('normal');
+    if (window.ExtingoAlert) window.ExtingoAlert.hide();
 
     els.routeDistance.textContent = '—';
     els.routeDistance.classList.remove('is-active');
