@@ -19,6 +19,11 @@
   // or after the fire was triggered here.
   var INCIDENT_KEY = 'extingoIncident';
 
+  // Written by the Dispatch console (js/dispatch-demo.js) when Fire Dept
+  // marks an incident resolved. We listen for it and auto-reset this whole
+  // dashboard — banner, sensors, log, everything — with no manual step here.
+  var RESOLVED_KEY = 'extingoResolved';
+
   /* ------------------------------------------------------------------ *
    * State
    * ------------------------------------------------------------------ */
@@ -538,6 +543,18 @@
     logEvent('Demo reset — baseline restored', 'info');
   }
   els.resetBtn.addEventListener('click', resetDemo);
+
+  /* ------------------------------------------------------------------ *
+   * Auto-reset — Dispatch marked the incident resolved
+   * 'storage' only fires in *other* tabs of the same origin, so this
+   * never re-triggers from the dashboard's own writes.
+   * ------------------------------------------------------------------ */
+  window.addEventListener('storage', function (e) {
+    if (e.key === RESOLVED_KEY && e.newValue) {
+      resetDemo();
+      logEvent('Fire Department confirmed incident resolved — dashboard reset automatically.', 'info');
+    }
+  });
 
   /* ------------------------------------------------------------------ *
    * Log panel collapse toggle
