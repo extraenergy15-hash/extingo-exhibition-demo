@@ -365,7 +365,7 @@
   }
 
   /* ------------------------------------------------------------------ *
-   * Toggles
+   * Toggles — flip visual state only; Submit Reading is what commits it
    * ------------------------------------------------------------------ */
   function wireToggle(btn, label) {
     btn.addEventListener('click', function () {
@@ -374,7 +374,6 @@
       btn.dataset.active = String(next);
       btn.setAttribute('aria-pressed', String(next));
       label.textContent = next ? 'ON' : 'OFF';
-      commitReading();
     });
   }
   wireToggle(els.toggleFlame, els.toggleFlameLabel);
@@ -434,11 +433,11 @@
   }
 
   /* ------------------------------------------------------------------ *
-   * Wire inputs — "on any change" triggers a full recompute
+   * Wire inputs — fields only stage a value; Submit Reading is the sole
+   * commit trigger, so it always captures every field's current value
+   * together as one snapshot (this is what makes multi-factor readings,
+   * e.g. heat + smoke + flame rising together, actually possible).
    * ------------------------------------------------------------------ */
-  [els.inputHeat, els.inputSmoke, els.inputX, els.inputY].forEach(function (input) {
-    input.addEventListener('change', commitReading);
-  });
   els.submitBtn.addEventListener('click', commitReading);
 
   /* ------------------------------------------------------------------ *
