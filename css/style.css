@@ -676,6 +676,22 @@ h1, h2, h3 { margin: 0; font-family: var(--font-display); }
 .reset-btn:hover { border-color: var(--text-dim); color: var(--text); }
 .reset-btn:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
 
+.resolve-btn {
+  all: unset;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  padding: 11px 22px;
+  border-radius: 5px;
+  text-align: center;
+  background: linear-gradient(135deg, var(--teal), #1fb39c);
+  color: #0a0c0e;
+}
+.resolve-btn:hover { filter: brightness(1.08); }
+.resolve-btn:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+
 .input-hint {
   margin: 14px 0 0;
   font-size: 12px;
