@@ -426,6 +426,9 @@
 
     if (status !== state.status) {
       logEvent('STATUS ' + state.status.toUpperCase() + ' → ' + status.toUpperCase() + ' — ' + statusDetailText(status, v.heat, v.smoke, v.flame), status);
+      if (status === 'emergency' && window.ExtingoAlert) {
+        window.ExtingoAlert.show(statusDetailText(status, v.heat, v.smoke, v.flame) + '\nPosition: (' + v.x + ', ' + v.y + ')');
+      }
       state.status = status;
     } else {
       logEvent(readingMsg, status);
@@ -444,6 +447,7 @@
    * Reset demo
    * ------------------------------------------------------------------ */
   function resetDemo() {
+    if (window.ExtingoAlert) window.ExtingoAlert.hide();
     els.inputHeat.value = BASELINE.heat;
     els.inputSmoke.value = BASELINE.smoke;
     els.inputX.value = BASELINE.x;
