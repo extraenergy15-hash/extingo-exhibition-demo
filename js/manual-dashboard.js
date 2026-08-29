@@ -13,6 +13,12 @@
 
   var BASELINE = { heat: 22, smoke: 15, flame: false, motion: false, x: 0, y: 0 };
 
+  // Cross-tab handoff to the Dispatch console. Dispatch listens for this key
+  // via the 'storage' event (fires in *other* tabs of the same origin) and
+  // also checks it on load, so it works whether Dispatch was opened before
+  // or after the fire was triggered here.
+  var INCIDENT_KEY = 'extingoIncident';
+
   /* ------------------------------------------------------------------ *
    * State
    * ------------------------------------------------------------------ */
@@ -36,6 +42,9 @@
     statusBanner: document.getElementById('status-banner'),
     statusText: document.getElementById('status-text'),
     statusDetail: document.getElementById('status-detail'),
+
+    fdBanner: document.getElementById('fd-banner'),
+    fdBannerText: document.getElementById('fd-banner-text'),
 
     flameValue: document.getElementById('flame-value'),
     flameState: document.getElementById('flame-state'),
@@ -331,6 +340,43 @@
   }
 
   /* ------------------------------------------------------------------ *
+   * Fire-department-informed banner + dispatch handoff
+   * ------------------------------------------------------------------ */
+  function showFDBanner() {
+    els.fdBanner.classList.add('is-visible');
+  }
+
+  function hideFDBanner() {
+    els.fdBanner.classList.remove('is-visible');
+  }
+
+  // Writes the incident to localStorage so any open Dispatch tab (or one
+  // opened later) picks it up automatically — see js/dispatch-demo.js.
+  function notifyDispatch(v) {
+    var incident = {
+      id: 'INC-' + Date.now(),
+      triggeredAt: new Date().toISOString(),
+      heat: v.heat,
+      smoke: v.smoke,
+      flame: v.flame,
+      x: v.x,
+      y: v.y
+    };
+    try {
+      localStorage.setItem(INCIDENT_KEY, JSON.stringify(incident));
+    } catch (e) {
+      console.warn('[Dashboard] Could not write incident to localStorage:', e.message);
+    }
+    logEvent('Dispatch notified — Fire Department alerted automatically.', 'emergency');
+    showFDBanner();
+  }
+
+  function clearDispatchIncident() {
+    try { localStorage.removeItem(INCIDENT_KEY); } catch (e) { /* ignore */ }
+    hideFDBanner();
+  }
+
+  /* ------------------------------------------------------------------ *
    * Action log (bounded to MAX_LOG entries, newest first)
    * ------------------------------------------------------------------ */
   function logEvent(message, level) {
@@ -429,6 +475,14 @@
       if (status === 'emergency' && window.ExtingoAlert) {
         window.ExtingoAlert.show(statusDetailText(status, v.heat, v.smoke, v.flame) + '\nPosition: (' + v.x + ', ' + v.y + ')');
       }
+      // Entering emergency: hand the incident to Dispatch and raise the
+      // top banner. Leaving emergency (fire brought back under control):
+      // clear the incident and drop the banner.
+      if (status === 'emergency' && state.status !== 'emergency') {
+        notifyDispatch(v);
+      } else if (status !== 'emergency' && state.status === 'emergency') {
+        clearDispatchIncident();
+      }
       state.status = status;
     } else {
       logEvent(readingMsg, status);
@@ -448,6 +502,7 @@
    * ------------------------------------------------------------------ */
   function resetDemo() {
     if (window.ExtingoAlert) window.ExtingoAlert.hide();
+    clearDispatchIncident();
     els.inputHeat.value = BASELINE.heat;
     els.inputSmoke.value = BASELINE.smoke;
     els.inputX.value = BASELINE.x;
