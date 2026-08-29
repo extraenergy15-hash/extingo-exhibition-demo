@@ -19,6 +19,12 @@
   // (or refreshed) after the fire already happened.
   var INCIDENT_KEY = 'extingoIncident';
 
+  // Written when Dispatch marks an incident resolved. The Dashboard listens
+  // for this key (js/manual-dashboard.js) and auto-resets itself — clearing
+  // its own banner and sensor readings — the moment Fire Dept confirms the
+  // fire is out, with no manual step needed on the dashboard side.
+  var RESOLVED_KEY = 'extingoResolved';
+
   /* ------------------------------------------------------------------ *
    * State
    * ------------------------------------------------------------------ */
@@ -58,6 +64,7 @@
     logToggle: document.getElementById('log-toggle'),
 
     triggerBtn: document.getElementById('trigger-alert'),
+    resolveBtn: document.getElementById('mark-resolved'),
     resetBtn: document.getElementById('reset-dispatch')
   };
 
@@ -244,7 +251,9 @@
     fetchRoute();
   }
 
-  function resetDispatch() {
+  // Shared visual reset — puts the map/route/status back to standby.
+  // Used by both the plain Reset button and Mark As Resolved.
+  function resetVisuals() {
     state.triggered = false;
     setStatus('normal');
     if (window.ExtingoAlert) window.ExtingoAlert.hide();
@@ -270,11 +279,33 @@
     // Clear the shared incident key too, so a fresh dashboard fire (after
     // its own reset) can hand off a new incident cleanly.
     try { localStorage.removeItem(INCIDENT_KEY); } catch (e) { /* ignore */ }
+  }
 
+  function resetDispatch() {
+    resetVisuals();
     logEvent('Dispatch reset. Standing by.', 'normal');
   }
 
+  // Fire confirmed out on-scene. Resets this console AND tells the
+  // dashboard (via localStorage, picked up by its 'storage' listener) to
+  // reset itself too — clearing its top banner and sensor readings so both
+  // screens end up back at their normal, resting state together.
+  function markResolved() {
+    if (!state.triggered) {
+      logEvent('No active incident to resolve.', 'info');
+      return;
+    }
+    resetVisuals();
+    logEvent('Incident marked RESOLVED — fire confirmed out. Notifying dashboard.', 'normal');
+    try {
+      localStorage.setItem(RESOLVED_KEY, String(Date.now()));
+    } catch (e) {
+      console.warn('[Dispatch] Could not notify dashboard of resolution:', e.message);
+    }
+  }
+
   els.triggerBtn.addEventListener('click', function () { triggerAlert('manual'); });
+  els.resolveBtn.addEventListener('click', markResolved);
   els.resetBtn.addEventListener('click', resetDispatch);
 
   /* ------------------------------------------------------------------ *
