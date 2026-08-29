@@ -1,0 +1,152 @@
+/* ==========================================================================
+   Dispatch layout
+   ========================================================================== */
+.dispatch-layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 22px;
+  align-items: stretch;
+}
+
+@media (max-width: 900px) {
+  .dispatch-layout { grid-template-columns: 1fr; }
+}
+
+.map-panel,
+.route-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 22px 22px;
+  box-shadow: var(--shadow-panel);
+  display: flex;
+  flex-direction: column;
+}
+
+.map-canvas-wrap {
+  position: relative;
+  height: 420px;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid var(--border-soft);
+  background: var(--surface-2);
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+}
+
+/* Fallback panel shown if Leaflet fails to load */
+.map-fallback {
+  display: none;
+  position: absolute;
+  inset: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: var(--surface-2);
+  padding: 24px;
+  text-align: center;
+}
+.map-fallback.is-visible { display: flex; }
+.map-fallback.fire-mode { background: linear-gradient(180deg, rgba(255,71,87,0.12), var(--surface-2)); }
+
+.map-fallback-pin {
+  font-size: 2.2rem;
+  line-height: 1;
+}
+.map-fallback.fire-mode .map-fallback-pin {
+  font-size: 3rem;
+  animation: fallback-pulse 0.7s ease-in-out infinite alternate;
+}
+@keyframes fallback-pulse {
+  from { transform: scale(1); }
+  to   { transform: scale(1.22); }
+}
+
+.map-fallback-coords {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  color: var(--teal);
+}
+.map-fallback.fire-mode .map-fallback-coords { color: var(--red); }
+
+.map-fallback-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+  max-width: 32ch;
+}
+
+/* Leaflet popup theming to match dark UI */
+.leaflet-popup-content-wrapper {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-family: var(--font-body);
+}
+.leaflet-popup-tip { background: var(--surface); }
+.leaflet-container a.leaflet-popup-close-button { color: var(--text-dim); }
+
+/* ==========================================================================
+   Route stats panel
+   ========================================================================== */
+.route-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 4px 0 16px;
+}
+
+.route-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-soft);
+}
+.route-stat:last-child { border-bottom: none; padding-bottom: 0; }
+
+.route-stat dt {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.route-stat dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 20px;
+  color: var(--text);
+}
+
+.route-stat dd.is-active { color: var(--red); }
+
+.route-note {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-faint);
+}
+
+/* ==========================================================================
+   Fire / station markers (Leaflet divIcon content styling)
+   ========================================================================== */
+.fire-marker-icon {
+  font-size: 1.9rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 6px rgba(255,71,87,0.75));
+}
+
+.station-marker-icon {
+  font-size: 1.6rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 5px rgba(53,224,196,0.7));
+}
