@@ -92,6 +92,19 @@
 .leaflet-popup-tip { background: var(--surface); }
 .leaflet-container a.leaflet-popup-close-button { color: var(--text-dim); }
 
+/* Marker name tooltips (hover) */
+.ext-marker-tooltip {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 4px 9px;
+  border-radius: 4px;
+  box-shadow: var(--shadow-panel);
+}
+.ext-marker-tooltip::before { border-top-color: var(--border); }
+
 /* ==========================================================================
    Route stats panel
    ========================================================================== */
