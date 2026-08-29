@@ -13,6 +13,12 @@
     FIRE_COORDS.lng + ',' + FIRE_COORDS.lat + '?overview=full&geometries=geojson';
   var MAX_LOG = 6;
 
+  // Same key the Dashboard (js/manual-dashboard.js) writes to when it
+  // detects a fire. We pick it up two ways: a 'storage' event while both
+  // tabs are open at once, and a check on load in case Dispatch is opened
+  // (or refreshed) after the fire already happened.
+  var INCIDENT_KEY = 'extingoIncident';
+
   /* ------------------------------------------------------------------ *
    * State
    * ------------------------------------------------------------------ */
@@ -197,7 +203,11 @@
   /* ------------------------------------------------------------------ *
    * Trigger / Reset
    * ------------------------------------------------------------------ */
-  function triggerAlert() {
+  // source: 'manual' (button click) or 'auto' (dashboard fire detection).
+  // Both paths plot the same default station + incident location — only
+  // the log wording and popup text differ, so it's clear in a demo which
+  // path fired.
+  function triggerAlert(source) {
     if (state.triggered) return;
     state.triggered = true;
 
@@ -205,11 +215,15 @@
     var coordStr = FIRE_COORDS.lat.toFixed(6) + ', ' + FIRE_COORDS.lng.toFixed(6);
     els.routeFireCoords.textContent = coordStr;
 
+    var popupHtml = source === 'auto'
+      ? '<b>🔥 FIRE DETECTED</b><br>JNV Ahmedabad<br>Auto-received from Extingo dashboard'
+      : '<b>🔥 FIRE DETECTED</b><br>JNV Ahmedabad<br>Extingo suppression active';
+
     if (leafletAvailable && map) {
       fireMarker = L.marker([FIRE_COORDS.lat, FIRE_COORDS.lng], { icon: fireIcon })
         .addTo(map)
         .bindTooltip('JNV Ahmedabad', { direction: 'top', offset: [0, -26], className: 'ext-marker-tooltip' })
-        .bindPopup('<b>🔥 FIRE DETECTED</b><br>JNV Ahmedabad<br>Extingo suppression active')
+        .bindPopup(popupHtml)
         .openPopup();
       map.flyTo([FIRE_COORDS.lat, FIRE_COORDS.lng], FIRE_ZOOM);
     } else {
@@ -219,7 +233,11 @@
       els.fallbackLabel.textContent = 'FIRE DETECTED — JNV Ahmedabad — Extingo suppression active';
     }
 
-    logEvent('Fire alert received from Extingo. Incident at ' + coordStr + '.', 'emergency');
+    var receivedMsg = source === 'auto'
+      ? 'Fire alert auto-received from Extingo dashboard. Incident at ' + coordStr + '.'
+      : 'Fire alert received from Extingo. Incident at ' + coordStr + '.';
+    logEvent(receivedMsg, 'emergency');
+
     if (window.ExtingoAlert) {
       window.ExtingoAlert.show('JNV Ahmedabad — ' + coordStr + '\nCalculating shortest route from Maninagar Fire Station…');
     }
@@ -249,11 +267,41 @@
       els.fallbackLabel.textContent = 'Map tiles unavailable — showing coordinates only';
     }
 
+    // Clear the shared incident key too, so a fresh dashboard fire (after
+    // its own reset) can hand off a new incident cleanly.
+    try { localStorage.removeItem(INCIDENT_KEY); } catch (e) { /* ignore */ }
+
     logEvent('Dispatch reset. Standing by.', 'normal');
   }
 
-  els.triggerBtn.addEventListener('click', triggerAlert);
+  els.triggerBtn.addEventListener('click', function () { triggerAlert('manual'); });
   els.resetBtn.addEventListener('click', resetDispatch);
+
+  /* ------------------------------------------------------------------ *
+   * Auto-dispatch — listen for the dashboard's fire handoff
+   * ------------------------------------------------------------------ */
+
+  // Case 1: Dispatch is already open in another tab when the fire happens.
+  // The 'storage' event only fires in *other* tabs of the same origin,
+  // which is exactly what we want here (never fires in the tab that wrote it).
+  window.addEventListener('storage', function (e) {
+    if (e.key === INCIDENT_KEY && e.newValue) {
+      logEvent('Incident received from dashboard — auto-dispatching.', 'warning');
+      triggerAlert('auto');
+    }
+  });
+
+  // Case 2: Dispatch is opened (or refreshed) after the fire was already
+  // triggered on the dashboard — pick up the still-pending incident on load.
+  (function checkForPendingIncident() {
+    try {
+      var raw = localStorage.getItem(INCIDENT_KEY);
+      if (raw) {
+        logEvent('Pending incident found on load — auto-dispatching.', 'warning');
+        triggerAlert('auto');
+      }
+    } catch (e) { /* localStorage unavailable — manual trigger still works */ }
+  })();
 
   /* ------------------------------------------------------------------ *
    * Log panel collapse toggle — same pattern as the dashboard
