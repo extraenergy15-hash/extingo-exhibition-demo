@@ -244,7 +244,15 @@
 
     var flameMotionScore = flame ? 100 : (motion ? 35 : 0);
 
-    var score = Math.round(heatScore * 0.35 + smokeScore * 0.35 + flameMotionScore * 0.30);
+    // Correlated-signal average: rewards multiple factors rising together.
+    var weightedAvg = heatScore * 0.35 + smokeScore * 0.35 + flameMotionScore * 0.30;
+    // Dominant-signal floor: a single factor that is itself near-maxed should
+    // read as clearly dangerous on its own, not get diluted just because the
+    // other two factors happen to be flat. A 30°C+ jump in one reading alone
+    // now lands in the red zone (>=70) instead of capping near 35.
+    var dominant = Math.max(heatScore, smokeScore, flameMotionScore) * 0.82;
+
+    var score = Math.round(Math.max(weightedAvg, dominant));
     score = clamp(score, 0, 100);
 
     return { score: score, ror: ror, smokeDelta: smokeDelta, heatScore: heatScore, smokeScore: smokeScore, flameMotionScore: flameMotionScore };
@@ -440,6 +448,12 @@
     state.status = 'normal';
     state.uptimeStart = Date.now();
     renderLog();
+
+    // Seed history with the baseline point so the first real submission has
+    // a genuine previous reading to diff against — without this, ror/smoke
+    // trend on the very first change always compute as 0 regardless of how
+    // large the actual jump was.
+    pushHistory(BASELINE.heat, BASELINE.smoke);
 
     applyStatus('normal', BASELINE.heat, BASELINE.smoke, false);
     applyGauge(0);
