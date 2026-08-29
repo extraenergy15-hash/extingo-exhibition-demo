@@ -394,8 +394,23 @@
     };
   }
 
+  function readingSignature(v) {
+    return [v.heat, v.smoke, v.flame, v.motion, v.x, v.y].join('|');
+  }
+
   function commitReading() {
     var v = readInputs();
+
+    // Guard against duplicate commits: the number/coordinate fields fire a
+    // 'change' event on blur AND the Submit Reading button can fire right
+    // after (e.g. tabbing out of a field then clicking Submit). If nothing
+    // actually changed since the last commit, re-committing the identical
+    // values would flatten the rate-of-rise and smoke-trend math to ~0 for
+    // this step and quietly overwrite a correct, higher score. Skip it.
+    var sig = readingSignature(v);
+    if (sig === state.lastSignature) return;
+    state.lastSignature = sig;
+
     var status = computeStatus(v.heat, v.smoke, v.flame);
     var pred = computePrediction(v.heat, v.smoke, v.flame, v.motion);
 
@@ -447,6 +462,7 @@
     state.log = [];
     state.status = 'normal';
     state.uptimeStart = Date.now();
+    state.lastSignature = [BASELINE.heat, BASELINE.smoke, BASELINE.flame, BASELINE.motion, BASELINE.x, BASELINE.y].join('|');
     renderLog();
 
     // Seed history with the baseline point so the first real submission has
