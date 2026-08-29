@@ -1,1 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Extingo — Manual Control Dashboard</title>
+<link rel="stylesheet" href="assets/fonts/fonts.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
 
+  <header class="site-header">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <div class="brand-text">
+        <span class="brand-name">EXTINGO</span>
+        <span class="brand-sub">Manual Control Dashboard</span>
+      </div>
+    </div>
+    <nav class="site-nav" aria-label="Primary">
+      <a class="site-nav-link is-active" href="index.html">Dashboard</a>
+      <a class="site-nav-link" href="documents.html">Documents</a>
+    </nav>
+    <div class="header-meta">
+      <div class="meta-item">
+        <span class="meta-label">Panel ID</span>
+        <span class="meta-value" id="panel-id">EX-CC-04 · DEMO</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Uptime</span>
+        <span class="meta-value" id="uptime">00:00:00</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Local Time</span>
+        <span class="meta-value" id="clock">--:--:--</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="hazard-rule" role="presentation"></div>
+
+  <main class="dashboard">
+
+    <div class="demo-mode-badge" role="note">
+      <span class="demo-mode-dot" aria-hidden="true"></span>
+      Manual Demo Mode — Live Hardware Not Connected
+    </div>
+
+    <section id="status-banner" class="status-banner status-normal" aria-live="polite">
+      <span class="status-led" aria-hidden="true"></span>
+      <div class="status-copy">
+        <span class="status-label">System Status</span>
+        <span class="status-value" id="status-text">NORMAL</span>
+      </div>
+      <span class="status-detail" id="status-detail">All zones reporting within safe range</span>
+    </section>
+
+    <section class="sensor-grid" aria-label="Manually entered sensor readings">
+
+      <article class="sensor-tile" data-sensor="flame">
+        <header class="tile-head">
+          <span class="tile-icon tile-icon-flame" aria-hidden="true"></span>
+          <h3 class="tile-title">Flame</h3>
+          <span class="tile-tag">IR</span>
+        </header>
+        <div class="tile-body">
+          <span class="tile-value" id="flame-value">CLEAR</span>
+        </div>
+        <footer class="tile-foot">
+          <span class="tile-state" id="flame-state">Clear</span>
+        </footer>
+      </article>
+
+      <article class="sensor-tile" data-sensor="smoke">
+        <header class="tile-head">
+          <span class="tile-icon tile-icon-smoke" aria-hidden="true"></span>
+          <h3 class="tile-title">Smoke</h3>
+          <span class="tile-tag">MQ2</span>
+        </header>
+        <div class="tile-body">
+          <span class="tile-value" id="smoke-value">0</span>
+          <span class="tile-unit">ppm</span>
+          <span class="tile-trend" id="smoke-trend" data-trend="flat">▬</span>
+        </div>
+        <footer class="tile-foot">
+          <span class="tile-state" id="smoke-state">Clear</span>
+        </footer>
+      </article>
+
+      <article class="sensor-tile" data-sensor="heat">
+        <header class="tile-head">
+          <span class="tile-icon tile-icon-heat" aria-hidden="true"></span>
+          <h3 class="tile-title">Heat</h3>
+          <span class="tile-tag">DHT22</span>
+        </header>
+        <div class="tile-body">
+          <span class="tile-value" id="heat-value">0</span>
+          <span class="tile-unit">°C</span>
+          <span class="tile-trend" id="heat-trend" data-trend="flat">▬</span>
+        </div>
+        <footer class="tile-foot">
+          <span class="tile-state" id="heat-state">Nominal</span>
+        </footer>
+      </article>
+
+      <article class="sensor-tile" data-sensor="motion">
+        <header class="tile-head">
+          <span class="tile-icon tile-icon-motion" aria-hidden="true"></span>
+          <h3 class="tile-title">Motion</h3>
+          <span class="tile-tag">PIR</span>
+        </header>
+        <div class="tile-body">
+          <span class="tile-value" id="motion-value">NONE</span>
+        </div>
+        <footer class="tile-foot">
+          <span class="tile-state" id="motion-state">Unoccupied</span>
+        </footer>
+      </article>
+
+      <article class="sensor-tile" data-sensor="zone">
+        <header class="tile-head">
+          <span class="tile-icon tile-icon-zone" aria-hidden="true"></span>
+          <h3 class="tile-title">Zone Position</h3>
+          <span class="tile-tag">X/Y</span>
+        </header>
+        <div class="tile-body tile-body-zone">
+          <span class="tile-value tile-value-small" id="zone-value">X:0 Y:0</span>
+          <svg class="zone-map" viewBox="0 0 100 100" role="img" aria-label="Zone position map">
+            <rect x="1" y="1" width="98" height="98" class="zone-map-bounds" />
+            <line x1="50" y1="0" x2="50" y2="100" class="zone-map-grid" />
+            <line x1="0" y1="50" x2="100" y2="50" class="zone-map-grid" />
+            <circle id="zone-dot" cx="0" cy="100" r="4" class="zone-map-dot" />
+          </svg>
+        </div>
+        <footer class="tile-foot">
+          <span class="tile-state" id="zone-state">Reporting</span>
+        </footer>
+      </article>
+
+    </section>
+
+    <section class="chart-row" aria-label="Sensor history charts">
+      <div class="chart-panel">
+        <header class="panel-head">
+          <span class="panel-eyebrow">CH.1</span>
+          <h3 class="panel-title">Smoke History</h3>
+          <span class="panel-note">Last 30 entries</span>
+        </header>
+        <div class="chart-canvas-wrap">
+          <canvas id="smoke-chart" role="img" aria-label="Line chart of manually entered smoke readings over time"></canvas>
+        </div>
+      </div>
+      <div class="chart-panel">
+        <header class="panel-head">
+          <span class="panel-eyebrow">CH.2</span>
+          <h3 class="panel-title">Heat History</h3>
+          <span class="panel-note">Last 30 entries</span>
+        </header>
+        <div class="chart-canvas-wrap">
+          <canvas id="heat-chart" role="img" aria-label="Line chart of manually entered heat readings over time"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <section class="prediction-panel" aria-label="Fire early-warning prediction">
+      <div class="prediction-gauge-wrap">
+        <svg class="prediction-gauge" viewBox="0 0 220 130" role="img" aria-labelledby="pred-gauge-title">
+          <title id="pred-gauge-title">Early-warning fire risk gauge</title>
+          <path class="gauge-track" d="M20 110 A90 90 0 0 1 200 110" />
+          <path class="gauge-fill" id="gauge-fill" d="M20 110 A90 90 0 0 1 200 110" />
+          <g id="gauge-needle" class="gauge-needle" transform="rotate(-90 110 110)">
+            <line x1="110" y1="110" x2="110" y2="34" />
+            <circle cx="110" cy="110" r="6" />
+          </g>
+          <text x="20" y="126" class="gauge-scale-label">0</text>
+          <text x="104" y="20" class="gauge-scale-label">50</text>
+          <text x="188" y="126" class="gauge-scale-label" text-anchor="end">100</text>
+        </svg>
+        <div class="gauge-readout">
+          <span class="gauge-percent" id="prediction-percent">0%</span>
+          <span class="gauge-caption" id="prediction-caption">Early-warning index</span>
+        </div>
+      </div>
+      <div class="prediction-detail">
+        <h3 class="panel-title">Fire Prediction</h3>
+        <p class="prediction-summary" id="prediction-summary">Awaiting sufficient entry history to compute a trend.</p>
+        <dl class="prediction-factors">
+          <div class="factor-row">
+            <dt>Heat rate-of-rise</dt>
+            <dd id="factor-heat-ror">—</dd>
+          </div>
+          <div class="factor-row">
+            <dt>Smoke trend</dt>
+            <dd id="factor-smoke-trend">—</dd>
+          </div>
+          <div class="factor-row">
+            <dt>Flame / motion weight</dt>
+            <dd id="factor-flame-motion">—</dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="log-panel">
+      <button type="button" class="log-toggle" id="log-toggle" aria-expanded="true" aria-controls="log-list">
+        <span class="panel-eyebrow">LOG</span>
+        <h3 class="panel-title">Action Log</h3>
+        <span class="log-toggle-icon" aria-hidden="true">▾</span>
+      </button>
+      <ul class="log-list" id="log-list"></ul>
+    </section>
+
+    <section class="input-panel" aria-label="Manual sensor input controls">
+      <header class="panel-head">
+        <span class="panel-eyebrow">MANUAL</span>
+        <h3 class="panel-title">Sensor Input Panel</h3>
+        <span class="panel-note">Judge demo mode — no live feed</span>
+      </header>
+
+      <div class="input-grid">
+
+        <div class="input-field">
+          <label for="input-heat">Heat (°C)</label>
+          <input type="number" id="input-heat" step="0.1" min="0" max="150" value="22">
+        </div>
+
+        <div class="input-field">
+          <label for="input-smoke">Smoke (ppm)</label>
+          <input type="number" id="input-smoke" step="1" min="0" max="3000" value="15">
+        </div>
+
+        <div class="input-field input-field-toggle">
+          <span class="input-field-label">Flame Detected</span>
+          <button type="button" class="toggle-btn" id="toggle-flame" data-active="false" aria-pressed="false">
+            <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+            <span class="toggle-btn-label" id="toggle-flame-label">OFF</span>
+          </button>
+        </div>
+
+        <div class="input-field input-field-toggle">
+          <span class="input-field-label">Motion Detected</span>
+          <button type="button" class="toggle-btn" id="toggle-motion" data-active="false" aria-pressed="false">
+            <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+            <span class="toggle-btn-label" id="toggle-motion-label">OFF</span>
+          </button>
+        </div>
+
+        <div class="input-field">
+          <label for="input-x">Position X (0–100)</label>
+          <input type="number" id="input-x" step="1" min="0" max="100" value="0">
+        </div>
+
+        <div class="input-field">
+          <label for="input-y">Position Y (0–100)</label>
+          <input type="number" id="input-y" step="1" min="0" max="100" value="0">
+        </div>
+
+      </div>
+
+      <div class="input-actions">
+        <button type="button" class="submit-btn" id="submit-reading">Submit Reading</button>
+        <button type="button" class="reset-btn" id="reset-demo">Reset Demo</button>
+      </div>
+      <p class="input-hint">Submitting a reading appends it to both charts, recomputes system status and the early-warning score, and writes a line to the action log above.</p>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <span>Extingo Manual Control Dashboard — manually entered readings, offline demo build</span>
+  </footer>
+
+  <script src="js/chart.umd.js"></script>
+  <script src="js/manual-dashboard.js"></script>
+</body>
+</html>
