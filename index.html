@@ -63,6 +63,120 @@
       <span class="status-detail" id="status-detail">All zones reporting within safe range</span>
     </section>
 
+    <!--
+      How Extingo Works — looping process animation.
+      Depends on css/style.css (how-it-works.css merged in) and
+      js/how-it-works.js (included near the bottom of this file).
+    -->
+    <section class="how-it-works-panel" aria-label="How Extingo works">
+      <header class="panel-head">
+        <span class="panel-eyebrow">PROCESS</span>
+        <h3 class="panel-title">How Extingo Works</h3>
+        <span class="panel-note">Looping demo — detect to suppress cycle</span>
+      </header>
+
+      <div class="hiw-stage" id="hiw-stage" data-phase="scan" data-branch="clear">
+        <svg class="hiw-svg" viewBox="0 0 1000 220" xmlns="http://www.w3.org/2000/svg"
+             role="img" aria-label="Animated diagram: sensor scans a room, confirms a flame, checks for people, suppresses the fire, then fires an alert cascade">
+
+          <!-- Sensor head + radar sweep -->
+          <g id="hiw-sensor">
+            <rect class="hiw-sensor-body" x="58" y="98" width="24" height="24" rx="5" />
+            <circle class="hiw-sensor-lens" cx="70" cy="110" r="4" />
+            <line class="hiw-radar-wedge" x1="70" y1="110" x2="70" y2="45" />
+          </g>
+
+          <!-- Compass / quadrant markers -->
+          <g id="hiw-compass">
+            <circle class="hiw-compass-ring" cx="230" cy="110" r="60" />
+            <circle class="hiw-quadrant-dot hiw-q-n" cx="230" cy="50" r="4" />
+            <text class="hiw-quadrant-label" x="238" y="46">N</text>
+            <circle class="hiw-quadrant-dot hiw-q-e" cx="290" cy="110" r="4" />
+            <text class="hiw-quadrant-label" x="298" y="114">E</text>
+            <circle class="hiw-quadrant-dot hiw-q-s" cx="230" cy="170" r="4" />
+            <text class="hiw-quadrant-label" x="238" y="184">S</text>
+            <circle class="hiw-quadrant-dot hiw-q-w" cx="170" cy="110" r="4" />
+            <text class="hiw-quadrant-label" x="150" y="114">W</text>
+          </g>
+
+          <!-- PIR indicator -->
+          <g id="hiw-pir">
+            <circle class="hiw-pir-dot" cx="140" cy="55" r="4" />
+            <text class="hiw-pir-label" x="150" y="59">PIR</text>
+          </g>
+
+          <!-- Flame + confirmation ring (sits at the N quadrant) -->
+          <g class="hiw-flame">
+            <circle class="hiw-confirm-ring" cx="230" cy="50" r="10" />
+            <path class="hiw-flame-shape"
+                  d="M230 40c-4 5-8 9-8 14a8 8 0 0 0 16 0c0-3-1-5-2-7 0 3-2 5-4 5-3 0-4-2-4-5 0-3 1-5 2-7z" />
+          </g>
+
+          <!-- Spray arc from pump to flame -->
+          <path class="hiw-spray" d="M478 100 C 400 40, 320 30, 236 46" />
+
+          <!-- Human silhouette -->
+          <g class="hiw-person">
+            <circle class="hiw-person-head" cx="380" cy="158" r="6" />
+            <rect class="hiw-person-body" x="368" y="166" width="24" height="26" rx="7" />
+          </g>
+
+          <!-- Pump + PWM labels -->
+          <g id="hiw-pump">
+            <rect class="hiw-pump-icon" x="466" y="98" width="26" height="24" rx="4" />
+            <rect class="hiw-pump-icon" x="490" y="106" width="10" height="8" rx="2" />
+            <text class="hiw-pwm-label hiw-pwm-label-reduced" x="452" y="140">PWM reduced</text>
+            <text class="hiw-pwm-label hiw-pwm-label-full" x="464" y="140">Full power</text>
+          </g>
+
+          <!-- Exhaust fan -->
+          <g id="hiw-fan">
+            <circle class="hiw-fan-hub" cx="580" cy="60" r="14" />
+            <g class="hiw-fan-blades">
+              <line class="hiw-fan-blade" x1="580" y1="60" x2="580" y2="49" />
+              <line class="hiw-fan-blade" x1="580" y1="60" x2="590" y2="67" />
+              <line class="hiw-fan-blade" x1="580" y1="60" x2="570" y2="67" />
+            </g>
+          </g>
+
+          <!-- Alert cascade -->
+          <path class="hiw-cascade-line" d="M650 150 L980 150" />
+
+          <g class="hiw-cascade-icon hiw-c1">
+            <circle cx="650" cy="150" r="14" />
+            <text class="hiw-cascade-tag" x="636" y="180">BUZZ</text>
+          </g>
+          <g class="hiw-cascade-icon hiw-c2">
+            <circle cx="732" cy="150" r="14" />
+            <text class="hiw-cascade-tag" x="718" y="180">WIFI</text>
+          </g>
+          <g class="hiw-cascade-icon hiw-c3">
+            <rect x="800" y="136" width="28" height="28" rx="6" />
+            <text class="hiw-cascade-tag" x="800" y="180">SMS</text>
+          </g>
+          <g class="hiw-cascade-icon hiw-c4">
+            <rect x="882" y="136" width="28" height="28" rx="6" />
+            <text class="hiw-cascade-tag" x="878" y="180">TELE+PHOTO</text>
+          </g>
+          <g class="hiw-cascade-icon hiw-c5">
+            <circle cx="966" cy="150" r="14" />
+            <text class="hiw-cascade-tag" x="952" y="180">CALL</text>
+          </g>
+
+        </svg>
+      </div>
+
+      <ol class="hiw-steps" id="hiw-steps">
+        <li class="hiw-step" data-step="scan"><span class="hiw-step-num">1</span><span>Scan</span></li>
+        <li class="hiw-step" data-step="detect"><span class="hiw-step-num">2</span><span>Detect &amp; Confirm</span></li>
+        <li class="hiw-step" data-step="safety"><span class="hiw-step-num">3</span><span>Human-Safety Check</span></li>
+        <li class="hiw-step" data-step="suppress"><span class="hiw-step-num">4</span><span>Suppress</span></li>
+        <li class="hiw-step" data-step="alert"><span class="hiw-step-num">5</span><span>Alert Cascade</span></li>
+      </ol>
+
+      <p class="visually-hidden" id="hiw-announcer" aria-live="polite"></p>
+    </section>
+
     <section class="sensor-grid" aria-label="Manually entered sensor readings">
 
       <article class="sensor-tile" data-sensor="flame">
@@ -281,5 +395,6 @@
   <script src="js/chart.umd.js"></script>
   <script src="js/alert-system.js"></script>
   <script src="js/manual-dashboard.js"></script>
+  <script src="js/how-it-works.js"></script>
 </body>
 </html>
