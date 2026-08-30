@@ -13,11 +13,11 @@
   var announcer = document.getElementById('hiw-announcer');
 
   var PHASES = [
-    { name: 'scan', duration: 2700, announce: 'Scanning the room' },
-    { name: 'detect', duration: 2800, announce: 'Flame detected, confirming' },
-    { name: 'safety', duration: 2600, announce: 'Checking for people in range' },
-    { name: 'suppress', duration: 2900, announce: 'Suppressing the fire' },
-    { name: 'alert', duration: 4200, announce: 'Sending alert cascade' }
+    { name: 'scan', duration: 5000, announce: 'Scanning the room' },
+    { name: 'detect', duration: 5200, announce: 'Flame detected, confirming' },
+    { name: 'safety', duration: 4800, announce: 'Checking for people in range' },
+    { name: 'suppress', duration: 5400, announce: 'Suppressing the fire' },
+    { name: 'alert', duration: 7500, announce: 'Sending alert cascade' }
   ];
 
   var reduceMotion = window.matchMedia &&
