@@ -966,3 +966,322 @@ button:focus-visible {
   .gauge-needle, .gauge-fill, .zone-map-dot { transition: none; }
   .dashboard, .site-header { animation: none; }
 }
+
+/* ==========================================================================
+   How Extingo Works — looping process animation panel
+   Append to css/style.css (uses the same design tokens: --amber, --teal,
+   --red, --surface, --border, --font-mono, --font-display, radius, shadow)
+   ========================================================================== */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.how-it-works-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 22px 22px;
+  box-shadow: var(--shadow-panel);
+}
+
+.hiw-stage {
+  background: var(--surface-2);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  padding: 10px 8px 4px;
+}
+
+.hiw-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+/* Sensor head + radar sweep --------------------------------------------- */
+.hiw-sensor-body { fill: var(--surface-3); stroke: var(--border); stroke-width: 1; }
+.hiw-sensor-lens { fill: var(--teal); filter: drop-shadow(0 0 3px rgba(53,224,196,0.6)); }
+
+.hiw-radar-wedge {
+  stroke: var(--teal);
+  stroke-width: 1.5;
+  opacity: 0.35;
+  transform-origin: 70px 110px;
+  transition: opacity 0.4s ease;
+}
+[data-phase="scan"] .hiw-radar-wedge {
+  opacity: 0.9;
+  animation: hiw-radar-sweep 2.6s ease-in-out 1;
+}
+
+@keyframes hiw-radar-sweep {
+  0%   { transform: rotate(-52deg); }
+  50%  { transform: rotate(52deg); }
+  100% { transform: rotate(-52deg); }
+}
+
+/* Compass / quadrant markers --------------------------------------------- */
+.hiw-compass-ring { fill: none; stroke: var(--border); stroke-width: 1; stroke-dasharray: 3 4; }
+
+.hiw-quadrant-dot {
+  fill: var(--text-faint);
+  transition: fill 0.3s ease, filter 0.3s ease;
+}
+.hiw-quadrant-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  fill: var(--text-faint);
+  letter-spacing: 0.06em;
+}
+
+[data-phase="scan"] .hiw-quadrant-dot.hiw-q-w { animation: hiw-quad-ping 2.6s ease 1; animation-delay: 0.15s; }
+[data-phase="scan"] .hiw-quadrant-dot.hiw-q-n { animation: hiw-quad-ping 2.6s ease 1; animation-delay: 0.75s; }
+[data-phase="scan"] .hiw-quadrant-dot.hiw-q-e { animation: hiw-quad-ping 2.6s ease 1; animation-delay: 1.55s; }
+[data-phase="scan"] .hiw-quadrant-dot.hiw-q-s { animation: hiw-quad-ping 2.6s ease 1; animation-delay: 2.15s; }
+
+@keyframes hiw-quad-ping {
+  0%, 100% { fill: var(--text-faint); filter: none; }
+  50% { fill: var(--amber); filter: drop-shadow(0 0 4px rgba(255,157,46,0.7)); }
+}
+
+/* Flame + confirmation ring ----------------------------------------------- */
+.hiw-flame {
+  opacity: 0;
+  transform: scale(0.5);
+  transform-origin: 230px 50px;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.hiw-flame-shape { fill: var(--red); filter: drop-shadow(0 0 5px rgba(255,71,87,0.6)); }
+
+[data-phase="detect"] .hiw-flame,
+[data-phase="safety"] .hiw-flame {
+  opacity: 1;
+  transform: scale(1);
+}
+[data-phase="suppress"] .hiw-flame {
+  opacity: 0;
+  transform: scale(0.15);
+  transition: opacity 1.4s ease 0.9s, transform 1.4s ease 0.9s;
+}
+
+.hiw-confirm-ring {
+  fill: none;
+  stroke: var(--amber);
+  stroke-width: 2;
+  opacity: 0;
+  transform-origin: 230px 50px;
+}
+[data-phase="detect"] .hiw-confirm-ring {
+  animation: hiw-confirm-pulse 1.3s ease-out infinite;
+}
+
+@keyframes hiw-confirm-pulse {
+  0%   { transform: scale(0.7); opacity: 0.9; }
+  100% { transform: scale(1.9); opacity: 0; }
+}
+
+/* PIR indicator ------------------------------------------------------------ */
+.hiw-pir-dot { fill: var(--teal); opacity: 0.3; transition: opacity 0.25s ease; }
+.hiw-pir-label { font-family: var(--font-mono); font-size: 9px; fill: var(--text-faint); letter-spacing: 0.06em; }
+
+[data-phase="detect"] .hiw-pir-dot,
+[data-phase="safety"] .hiw-pir-dot {
+  animation: hiw-pir-blink 0.9s steps(2, jump-none) infinite;
+}
+
+@keyframes hiw-pir-blink {
+  0%, 49%  { opacity: 0.9; filter: drop-shadow(0 0 4px rgba(53,224,196,0.7)); }
+  50%, 100% { opacity: 0.25; filter: none; }
+}
+
+/* Human silhouette ---------------------------------------------------------- */
+.hiw-person {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+[data-phase="safety"][data-branch="present"] .hiw-person,
+[data-phase="suppress"][data-branch="present"] .hiw-person {
+  opacity: 1;
+}
+.hiw-person-head, .hiw-person-body { fill: var(--text-dim); }
+
+/* Pump + PWM labels ----------------------------------------------------------- */
+.hiw-pump-icon { fill: var(--amber); transition: opacity 0.4s ease, filter 0.4s ease; }
+[data-branch="present"] .hiw-pump-icon {
+  opacity: 0.45;
+  filter: grayscale(55%);
+}
+
+.hiw-pwm-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.hiw-pwm-label-reduced { fill: var(--amber); }
+.hiw-pwm-label-full { fill: var(--teal); }
+
+[data-phase="safety"][data-branch="present"] .hiw-pwm-label-reduced,
+[data-phase="suppress"][data-branch="present"] .hiw-pwm-label-reduced {
+  opacity: 1;
+}
+[data-phase="safety"][data-branch="clear"] .hiw-pwm-label-full,
+[data-phase="suppress"][data-branch="clear"] .hiw-pwm-label-full {
+  opacity: 1;
+}
+
+/* Spray arc ------------------------------------------------------------------- */
+.hiw-spray {
+  fill: none;
+  stroke: var(--teal);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 6 6;
+  stroke-dashoffset: 240;
+  opacity: 0;
+  transition: stroke-dashoffset 1.1s ease, opacity 0.3s ease;
+}
+[data-phase="suppress"] .hiw-spray {
+  stroke-dashoffset: 0;
+  opacity: 0.9;
+}
+
+/* Exhaust fan ------------------------------------------------------------------ */
+.hiw-fan-blades { transform-origin: 580px 60px; }
+[data-phase="suppress"] .hiw-fan-blades {
+  animation: hiw-fan-spin 0.6s linear infinite;
+}
+.hiw-fan-blade { stroke: var(--text-dim); stroke-width: 2; stroke-linecap: round; }
+.hiw-fan-hub { fill: var(--surface-3); stroke: var(--border); stroke-width: 1; }
+
+@keyframes hiw-fan-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Alert cascade ------------------------------------------------------------------ */
+.hiw-cascade-line {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 2;
+  stroke-dasharray: 340;
+  stroke-dashoffset: 340;
+  transition: stroke-dashoffset 1.5s linear, stroke 0.4s ease;
+}
+[data-phase="alert"] .hiw-cascade-line {
+  stroke-dashoffset: 0;
+  stroke: var(--amber);
+}
+
+.hiw-cascade-icon circle,
+.hiw-cascade-icon rect,
+.hiw-cascade-icon path {
+  fill: var(--surface-3);
+  stroke: var(--border);
+  stroke-width: 1;
+  transition: fill 0.4s ease, filter 0.4s ease, stroke 0.4s ease;
+}
+.hiw-cascade-tag {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  fill: var(--text-faint);
+  letter-spacing: 0.05em;
+  transition: fill 0.4s ease;
+}
+
+[data-phase="alert"] .hiw-cascade-icon.hiw-c1 { animation: hiw-cascade-fire 0.45s ease forwards; animation-delay: 0.05s; }
+[data-phase="alert"] .hiw-cascade-icon.hiw-c2 { animation: hiw-cascade-fire 0.45s ease forwards; animation-delay: 0.4s; }
+[data-phase="alert"] .hiw-cascade-icon.hiw-c3 { animation: hiw-cascade-fire 0.45s ease forwards; animation-delay: 0.75s; }
+[data-phase="alert"] .hiw-cascade-icon.hiw-c4 { animation: hiw-cascade-fire 0.45s ease forwards; animation-delay: 1.1s; }
+[data-phase="alert"] .hiw-cascade-icon.hiw-c5 { animation: hiw-cascade-fire 0.45s ease forwards; animation-delay: 1.45s; }
+
+[data-phase="alert"] .hiw-cascade-icon.hiw-c1 .hiw-cascade-tag { transition-delay: 0.05s; fill: var(--amber); }
+[data-phase="alert"] .hiw-cascade-icon.hiw-c2 .hiw-cascade-tag { transition-delay: 0.4s; fill: var(--amber); }
+[data-phase="alert"] .hiw-cascade-icon.hiw-c3 .hiw-cascade-tag { transition-delay: 0.75s; fill: var(--amber); }
+[data-phase="alert"] .hiw-cascade-icon.hiw-c4 .hiw-cascade-tag { transition-delay: 1.1s; fill: var(--amber); }
+[data-phase="alert"] .hiw-cascade-icon.hiw-c5 .hiw-cascade-tag { transition-delay: 1.45s; fill: var(--amber); }
+
+@keyframes hiw-cascade-fire {
+  0%   { fill: var(--surface-3); filter: none; }
+  60%  { fill: var(--red); filter: drop-shadow(0 0 8px rgba(255,71,87,0.85)); }
+  100% { fill: var(--amber); filter: drop-shadow(0 0 6px rgba(255,157,46,0.75)); }
+}
+
+/* Step labels ---------------------------------------------------------------------- */
+.hiw-steps {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin: 14px 0 0;
+  padding: 0;
+}
+
+.hiw-step {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+  border-top: 2px solid var(--border-soft);
+  padding-top: 8px;
+  transition: color 0.3s ease, border-color 0.3s ease;
+}
+
+.hiw-step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  font-size: 9px;
+  flex-shrink: 0;
+  transition: border-color 0.3s ease, color 0.3s ease;
+}
+
+.hiw-step.is-active {
+  color: var(--amber);
+  border-top-color: var(--amber);
+}
+.hiw-step.is-active .hiw-step-num {
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+@media (max-width: 760px) {
+  .hiw-steps { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Reduced motion --------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .hiw-radar-wedge,
+  .hiw-quadrant-dot,
+  .hiw-confirm-ring,
+  .hiw-pir-dot,
+  .hiw-fan-blades,
+  .hiw-cascade-icon {
+    animation: none !important;
+  }
+  .hiw-flame,
+  .hiw-person,
+  .hiw-pump-icon,
+  .hiw-pwm-label,
+  .hiw-spray,
+  .hiw-cascade-line,
+  .hiw-cascade-tag {
+    transition-duration: 0.15s !important;
+  }
+}
